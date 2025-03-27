@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, Alert } from "react-native";
 import userData from "../../data/data.json";
 
-export default function Login({ logMe }) {
+export default function Login({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -13,7 +13,7 @@ export default function Login({ logMe }) {
 
     if (user) {
       Alert.alert("Succès", "Connexion réussie!", [
-        { text: "OK", onPress: () => logMe(true) }
+        { text: "OK", onPress: () => onLoginSuccess(true, user.user_name) }
       ]);
     } else {
       Alert.alert("Erreur", "Nom d'utilisateur ou mot de passe incorrect");
