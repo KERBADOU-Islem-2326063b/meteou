@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert } from "react-native";
+import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import userData from "../../data/data.json";
 
 export default function Login({ onLoginSuccess }) {
@@ -21,24 +21,52 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <View
-      style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}
-    >
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Connexion</Text>
+    <View style={styles.container}>
+
+      <Text style={styles.title}>Connexion</Text>
       <TextInput
         placeholder="Nom d'utilisateur"
         value={username}
         onChangeText={setUsername}
-        style={{ width: "100%", padding: 10, borderWidth: 1, marginBottom: 10, borderRadius: 5 }}
+        style={styles.input}
       />
       <TextInput
         placeholder="Mot de passe"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={{ width: "100%", padding: 10, borderWidth: 1, marginBottom: 20, borderRadius: 5 }}
+        style={styles.input}
       />
       <Button title="Se connecter" onPress={handleLogin} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f4f4f4",
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+    fontWeight: "bold",
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    borderWidth: 1,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: "#fff",
+  },
+  button: {
+    marginTop: 10,
+    backgroundColor: "#4CAF50",
+    padding: 10,
+    borderRadius: 5,
+  },
+});
