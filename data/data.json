@@ -1,0 +1,49 @@
+{
+    "utilisateur": [
+        {
+            "user_name": "daniel_23",
+            "mdp": "coucou35",
+            "ville": [
+                {"Montpellier": "43.6117, 3.8767"},
+                {"Digne-les-Bains": "44.0891, 6.2247"},
+                {"Nice": "43.7102, 7.2620"}
+            ]
+        },
+        {
+            "user_name": "lucie_45",
+            "mdp": "motdepasse123",
+            "ville": [
+                {"Paris": "48.8566, 2.3522"},
+                {"Marseille": "43.2965, 5.3698"},
+                {"Lyon": "45.7640, 4.8357"}
+            ]
+        },
+        {
+            "user_name": "thomas_78",
+            "mdp": "securepass89",
+            "ville": [
+                {"Toulouse": "43.6047, 1.4442"},
+                {"Bordeaux": "44.8378, -0.5792"},
+                {"Lille": "50.6292, 3.0573"}
+            ]
+        },
+        {
+            "user_name": "emma_90",
+            "mdp": "mypassword567",
+            "ville": [
+                {"Nantes": "47.2184, -1.5536"},
+                {"Strasbourg": "48.5734, 7.7521"},
+                {"Rennes": "48.1173, -1.6778"}
+            ]
+        },
+        {
+            "user_name": "olivier_21",
+            "mdp": "secretcode987",
+            "ville": [
+                {"Lyon": "45.7640, 4.8357"},
+                {"Aix-en-Provence": "43.5297, 5.4474"},
+                {"Saint-Étienne": "45.4397, 4.3872"}
+            ]
+        }
+    ]
+}
