@@ -3,8 +3,8 @@ import Home from "./Home/Home";
 import Login from "./Login/Login";
 
 export default function Index() {
-  const [logged, setLogged] = useState(false);
-  const [username, setUsername] = useState("");
+  const [logged, setLogged] = useState(true); //remettre false apres les tests
+  const [username, setUsername] = useState("Utilisateur test");
 
   const handleLoginSuccess = (status, loggedInUsername) => {
     setLogged(status);
