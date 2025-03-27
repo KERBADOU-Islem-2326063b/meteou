@@ -1,20 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import Hamburger from "./Hamburger";  // Assure-toi que le chemin d'importation est correct
 
-export default function Header({ navigation }) {
+export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);  // Inverse l'état pour ouvrir/fermer le menu
+  };
+
   return (
     <View style={styles.header}>
       <View style={styles.menuContainer}>
-        <TouchableOpacity
-          style={styles.menuToggle}
-          onPress={() => navigation.openDrawer()} // Ouvre le drawer lorsqu'on clique sur le menu
-        >
+        <TouchableOpacity style={styles.menuToggle} onPress={handleMenuToggle}>
           <Text style={styles.menuText}>☰</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.title}>
         <Text style={styles.titleText}>MétéOù ?</Text>
       </View>
+
+      {/* Afficher ou masquer le menu hamburger en fonction de isMenuOpen */}
+      {isMenuOpen && <Hamburger />}
     </View>
   );
 }

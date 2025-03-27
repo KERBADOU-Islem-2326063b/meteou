@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
-export default function Hamburger({ navigation }) {
+export default function Hamburger() {
   const handleVillesClick = () => {
     console.log("Naviguer vers Villes");
     // Logique pour naviguer vers le composant Villes ou afficher les informations
@@ -13,6 +13,7 @@ export default function Hamburger({ navigation }) {
   };
 
   const handleLogoutClick = () => {
+    // Affichage d'une alerte lors de la déconnexion
     Alert.alert(
       "Déconnexion",
       "Voulez-vous vraiment vous déconnecter ?",
@@ -25,7 +26,7 @@ export default function Hamburger({ navigation }) {
           text: "Oui",
           onPress: () => {
             console.log("Utilisateur déconnecté");
-            // Logique de déconnexion
+            // Ici tu peux ajouter la logique de déconnexion (effacer les tokens, rediriger, etc.)
           },
         },
       ]
