@@ -1,12 +1,18 @@
 import React from "react";
-import { View, Text, Button } from "react-native";
+import { View, StyleSheet } from "react-native";
+import Header from "../Header/Header";
 
 export default function Home({ username, onLogout }) {
-
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Bienvenue</Text>
-      <Button title="Se déconnecter" onPress={onLogout} />
+    <View style={styles.container}>
+      <Header />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+});

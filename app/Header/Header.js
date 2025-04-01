@@ -1,44 +1,36 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Hamburger from "./Hamburger";  // Assure-toi que le chemin d'importation est correct
+import Hamburger from "./Hamburger"; 
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);  // Inverse l'état pour ouvrir/fermer le menu
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <View style={styles.header}>
-      <View style={styles.menuContainer}>
+    <View style={styles.headerContainer}>
+      <View style={styles.header}>
         <TouchableOpacity style={styles.menuToggle} onPress={handleMenuToggle}>
           <Text style={styles.menuText}>☰</Text>
         </TouchableOpacity>
-      </View>
-      <View style={styles.title}>
-        <Text style={styles.titleText}>MétéOù ?</Text>
+        <View style={styles.title}>
+          <Text style={styles.titleText}>MétéOù ?</Text>
+        </View>
       </View>
 
-      {/* Afficher ou masquer le menu hamburger en fonction de isMenuOpen */}
-      {isMenuOpen && <Hamburger />}
-    </View>
+      <Hamburger onClose={() => setIsMenuOpen(false)} isOpen={isMenuOpen} />
+      </View>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: 10,
-    backgroundColor: "#333",
-  },
-  menuContainer: {
-    paddingLeft: 10,
-  },
-  menuToggle: {
-    padding: 10,
+    backgroundColor: "#6562DF",
+    padding: 15,
   },
   menuText: {
     fontSize: 24,
@@ -52,5 +44,6 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 24,
     color: "white",
+    fontWeight: "bold",
   },
 });
