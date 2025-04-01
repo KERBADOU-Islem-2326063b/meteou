@@ -1,27 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
+import { AuthProvider, useAuth } from "./Contexts/AuthContext";
 import Home from "./Home/Home";
 import Login from "./Login/Login";
 
 export default function Index() {
-  const [logged, setLogged] = useState(false);
-  const [username, setUsername] = useState("");
+  return (
+    <AuthProvider>
+      <AuthContent />
+    </AuthProvider>
+  );
+}
 
-  const handleLoginSuccess = (status, loggedInUsername) => {
-    setLogged(status);
-    setUsername(loggedInUsername);
-  };
+function AuthContent() {
+  const { logged, username, handleLoginSuccess } = useAuth();
 
-  const handleLogout = (status) => {
-    setLogged(status);
-    setUsername("");
-  };
-
-  if (logged) {
-    return <Home username={username} onLogout={() => handleLogout(false)}/>; 
-  }
-  else {
-    return (
-      <Login onLoginSuccess={handleLoginSuccess}/> 
-    );
-  }
+  return logged ? (
+    <Home username={username} />
+  ) : (
+    <Login onLoginSuccess={handleLoginSuccess} />
+  );
 }
