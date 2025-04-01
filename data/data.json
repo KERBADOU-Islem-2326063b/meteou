@@ -1,6 +1,15 @@
 {
     "utilisateur": [
         {
+            "user_name": "A",
+            "mdp": "A",
+            "ville": [
+                {"Montpellier": "43.6117, 3.8767"},
+                {"Digne-les-Bains": "44.0891, 6.2247"},
+                {"Nice": "43.7102, 7.2620"}
+            ]
+        },
+        {
             "user_name": "daniel_23",
             "mdp": "coucou35",
             "ville": [

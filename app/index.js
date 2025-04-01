@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
+import { AuthProvider, useAuth } from "./Contexts/AuthContext";
 import Home from "./Home/Home";
 import Login from "./Login/Login";
 import Graph from "./Graph/Graph";
 
-export default function Connexion() {
-  const [logged, setLogged] = useState(true);
+export default function Index() {
+  return (
+    <AuthProvider>
+      <AuthContent />
+    </AuthProvider>
+  );
+}
 
-  if (logged) {
-    //return <Home logMe={setLogged}/>;
-    return <Graph logMe={setLogged}/>;
-  } 
-  else {
-    return (
-      <Login logMe={setLogged}/>
-    );
-  }
+function AuthContent() {
+  const { logged, username, handleLoginSuccess } = useAuth();
+
+  return logged ? (
+    <Home username={username} />
+  ) : (
+    <Login onLoginSuccess={handleLoginSuccess} />
+  );
 }
