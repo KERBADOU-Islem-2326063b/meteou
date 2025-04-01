@@ -14,9 +14,7 @@ export default function Login() {
     );
 
     if (user) {
-      Alert.alert("Succès", "Connexion réussie!", [
-        { text: "OK", onPress: () => handleLoginSuccess(true, user.user_name) }
-      ]);
+      handleLoginSuccess(true, user.user_name);
     } else {
       Alert.alert("Erreur", "Nom d'utilisateur ou mot de passe incorrect");
     }

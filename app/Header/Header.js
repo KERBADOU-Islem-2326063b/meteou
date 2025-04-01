@@ -1,27 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Hamburger from "./Hamburger"; 
 
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
+export default function Header({ onMenuToggle }) {
   return (
-    <View style={styles.headerContainer}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.menuToggle} onPress={handleMenuToggle}>
-          <Text style={styles.menuText}>☰</Text>
-        </TouchableOpacity>
-        <View style={styles.title}>
-          <Text style={styles.titleText}>MétéOù ?</Text>
-        </View>
+    <View style={styles.header}>
+      <TouchableOpacity style={styles.menuToggle} onPress={onMenuToggle}>
+        <Text style={styles.menuText}>☰</Text>
+      </TouchableOpacity>
+      <View style={styles.title}>
+        <Text style={styles.titleText}>MétéOù?</Text>
       </View>
-
-      <Hamburger onClose={() => setIsMenuOpen(false)} isOpen={isMenuOpen} />
-      </View>
+    </View>
   );
 }
 
@@ -33,7 +22,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   menuText: {
-    fontSize: 24,
+    fontSize: 30,
     color: "white",
   },
   title: {

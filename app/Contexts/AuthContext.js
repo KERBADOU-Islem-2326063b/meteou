@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [logged, setLogged] = useState(false);
   const [username, setUsername] = useState("");
   const [cities, setCities] = useState([]);
+  const [selectedCity, setSelectedCity] = useState(null);
 
   const handleLoginSuccess = (status, loggedInUsername) => {
     setLogged(status);
@@ -25,8 +26,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ logged, username, cities, handleLoginSuccess, handleLogout }}>
-      {children}
+    <AuthContext.Provider value={{ logged, username, cities, selectedCity, setSelectedCity, handleLoginSuccess, handleLogout }}>
+        {children}
     </AuthContext.Provider>
   );
 };
