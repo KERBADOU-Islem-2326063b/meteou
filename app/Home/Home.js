@@ -6,12 +6,18 @@ import Graph from "../Graph/Graph";
 import Api from "../Api/Api";
 import { styles } from "./HomeStyle"; 
 
-
 export default function Home() {
   const { selectedCity, setSelectedCity, handleLogout, cities } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedData, setSelectedData] = useState({
+    temperature: true,
+    rain: false,
+    cloudCover: false,
+    precipitationProbability: false,
+  });
+
   const drawerRef = useRef(null);
 
   useEffect(() => {
@@ -38,6 +44,10 @@ export default function Home() {
     ]);
   };
 
+  const toggleDataSelection = (key) => {
+    setSelectedData((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const navigationView = () => (
     <View style={styles.menu}>
       <TouchableOpacity style={styles.closeButton} onPress={() => drawerRef.current?.closeDrawer()}>
@@ -48,14 +58,13 @@ export default function Home() {
       {cities && cities.length > 0 ? (
         cities.map((city, index) => {
           const cityName = Object.keys(city)[0];
-          const cityCoordinates = city[cityName];
 
           return (
             <TouchableOpacity
               key={index}
               style={styles.cityItem}
               onPress={() => {
-                setSelectedCity(`${cityName}`);
+                setSelectedCity(cityName);
                 drawerRef.current?.closeDrawer();
                 setIsMenuOpen(false);
               }}
@@ -71,6 +80,25 @@ export default function Home() {
       <TouchableOpacity style={styles.addCityButton}>
         <Text style={styles.addCityText}>+</Text>
       </TouchableOpacity>
+
+      <Text style={styles.sectionTitle}>Données affichées :</Text>
+      {[
+        { key: "temperature", label: "Température", color: "#1E90FF" },
+        { key: "rain", label: "Pluie", color: "#4CAF50" },
+        { key: "cloudCover", label: "Nuages", color: "#FF9800" },
+        { key: "precipitationProbability", label: "Probabilité précip.", color: "#E91E63" },
+      ].map((item) => (
+        <TouchableOpacity
+          key={item.key}
+          style={[
+            styles.dataButton,
+            { backgroundColor: selectedData[item.key] ? item.color : "#ddd" },
+          ]}
+          onPress={() => toggleDataSelection(item.key)}
+        >
+          <Text style={{ color: selectedData[item.key] ? "#fff" : "#000" }}>{item.label}</Text>
+        </TouchableOpacity>
+      ))}
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogoutClick}>
         <Text style={styles.logoutText}>Déconnexion</Text>
@@ -106,7 +134,7 @@ export default function Home() {
               {loading ? (
                 <Text style={styles.loadingText}>Chargement des données météo...</Text>
               ) : weatherData ? (
-                <Graph data={weatherData} />
+                <Graph data={weatherData} selectedData={selectedData} />
               ) : (
                 <Text style={styles.errorText}>Aucune donnée disponible.</Text>
               )}
@@ -114,15 +142,12 @@ export default function Home() {
           ) : (
             <Text style={styles.promptText}>
               Bienvenue sur notre application de météo !{'\n\n'}
-              Vous trouvez ici les données météo pour la semaine. De plus, vous pourrez choisir 
-              quelle données vous souhaitez afficher à votre guise.{'\n\n'}
-              Il y a également un graphe permettant une meilleure visualisation des données.
+              Vous pouvez choisir quelles données afficher en ouvrant le menu et en sélectionnant les types de données.{'\n\n'}
+              Un graphe vous permettra une meilleure visualisation.
             </Text>
           )}
         </View>
       </View>
     </DrawerLayoutAndroid>
   );
-
 }
-
