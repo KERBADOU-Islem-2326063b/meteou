@@ -24,7 +24,7 @@ export default function Api({ city, onDataReceived }) {
 
       const weatherRes = await fetch(
 
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,cloud_cover&timezone=Europe/Paris&forecast_days=1`
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,cloud_cover&timezone=Europe/Paris&forecast_days=7`
 
       );
       const weatherData = await weatherRes.json();
