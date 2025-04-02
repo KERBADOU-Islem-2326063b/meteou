@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, DrawerLayoutAndroid, Alert } from "react-native";
+import { View, Text, TouchableOpacity, DrawerLayoutAndroid, TextInput, Alert } from "react-native";
 import Header from "../Header/Header";
 import { useAuth } from "../Contexts/AuthContext";
 import Graph from "../Graph/Graph";
 import Api from "../Api/Api";
-import { styles } from "./HomeStyle"; 
+import { styles } from "./HomeStyle";
 
 export default function Home() {
-  const { selectedCity, setSelectedCity, handleLogout, cities } = useAuth();
+  const { selectedCity, setSelectedCity, handleLogout, cities, setCities } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [newCity, setNewCity] = useState(""); 
   const [selectedData, setSelectedData] = useState({
     temperature: true,
     precipitations: false,
@@ -49,6 +51,24 @@ export default function Home() {
     setSelectedData((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handleAddCity = () => {
+    if (!newCity.trim()) return;
+
+    fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${newCity}&count=1&language=fr&format=json`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.results || data.results.length === 0) {
+          alert("Ville non trouvée !");
+          return;
+        }
+
+        setCities((prevCities) => [...prevCities, { [newCity]: {} }]);
+        setNewCity("");
+        setShowForm(false);
+      })
+      .catch((error) => console.error("Erreur lors du géocodage :", error));
+  };
+
   const navigationView = () => (
     <View style={styles.menu}>
       <TouchableOpacity style={styles.closeButton} onPress={() => drawerRef.current?.closeDrawer()}>
@@ -78,8 +98,27 @@ export default function Home() {
         <Text style={styles.cityPlaceholder}>Ajoutez une ville</Text>
       )}
 
-      <TouchableOpacity style={styles.addCityButton}>
-        <Text style={styles.addCityText}>+</Text>
+      {showForm && (
+        <View style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Ajouter une ville..."
+            placeholderTextColor="#ddd"
+            value={newCity}
+            onChangeText={setNewCity}
+          />
+
+          <TouchableOpacity style={styles.validateButton} onPress={handleAddCity}>
+            <Text style={styles.validateText}>Valider</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <TouchableOpacity 
+        style={styles.addCityButton} 
+        onPress={() => setShowForm(!showForm)}
+      >
+        <Text style={styles.addCityText}>{showForm ? "✕" : "+"}</Text>
       </TouchableOpacity>
 
       <Text style={styles.sectionTitle}>Données affichées :</Text>
@@ -130,16 +169,13 @@ export default function Home() {
               <Api 
                 city={selectedCity} 
                 onDataReceived={(data) => {
-                  
-                  if (data && data.datasets && data.datasets[0] && data.datasets[0].data) {
+                  if (data?.datasets?.[0]?.data) {
                     const temps = data.datasets[0].data;
                     const currentWeatherData = {
                       temperature: temps[0]?.toFixed(1) || "N/A",
                       precipitation: data.precipitation?.[0]?.toFixed(1) || "0",
                       humidity: data.humidity?.[0] || "N/A",
-                      clouds: Array.isArray(data.clouds) && data.clouds.length > 0 ? data.clouds[0] : "N/A",
-
-
+                      clouds: data.clouds?.[0] || "N/A",
                     };
                     
                     setCurrentWeather(currentWeatherData);
@@ -161,15 +197,11 @@ export default function Home() {
                   <Graph data={weatherData} selectedData={selectedData} />
                 </>
               )}
-              {!loading && !weatherData && (
-                <Text style={styles.errorText}>Aucune donnée disponible.</Text>
-              )}
               </>
           ) : (
             <Text style={styles.promptText}>
               Bienvenue sur notre application de météo !{'\n\n'}
-              Vous pouvez choisir quelles données afficher en ouvrant le menu et en sélectionnant les types de données.{'\n\n'}
-              Un graphe vous permettra une meilleure visualisation.
+              Vous pouvez ajouter une ville pour voir ses prévisions.
             </Text>
           )}
         </View>
