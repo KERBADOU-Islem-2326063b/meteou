@@ -4,15 +4,20 @@ import Header from "../Header/Header";
 import { useAuth } from "../Contexts/AuthContext";
 import Graph from "../Graph/Graph";
 import Api from "../Api/Api";
-import WeatherDetails from "../WeatherDetails/WeatherDetails";
 import { styles } from "./HomeStyle"; 
-
 
 export default function Home() {
   const { selectedCity, setSelectedCity, handleLogout, cities } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedData, setSelectedData] = useState({
+    temperature: true,
+    precipitations: false,
+    nuages: false,
+    humidites: false,
+  });
+
   const drawerRef = useRef(null);
   const [currentWeather, setCurrentWeather] = useState(null);
 
@@ -40,6 +45,10 @@ export default function Home() {
     ]);
   };
 
+  const toggleDataSelection = (key) => {
+    setSelectedData((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const navigationView = () => (
     <View style={styles.menu}>
       <TouchableOpacity style={styles.closeButton} onPress={() => drawerRef.current?.closeDrawer()}>
@@ -50,14 +59,13 @@ export default function Home() {
       {cities && cities.length > 0 ? (
         cities.map((city, index) => {
           const cityName = Object.keys(city)[0];
-          const cityCoordinates = city[cityName];
 
           return (
             <TouchableOpacity
               key={index}
               style={styles.cityItem}
               onPress={() => {
-                setSelectedCity(`${cityName}`);
+                setSelectedCity(cityName);
                 drawerRef.current?.closeDrawer();
                 setIsMenuOpen(false);
               }}
@@ -73,6 +81,25 @@ export default function Home() {
       <TouchableOpacity style={styles.addCityButton}>
         <Text style={styles.addCityText}>+</Text>
       </TouchableOpacity>
+
+      <Text style={styles.sectionTitle}>Données affichées :</Text>
+      {[
+        { key: "temperature", label: "Température", color: "#1E90FF" },
+        { key: "precipitations", label: "Pluie", color: "#4CAF50" },
+        { key: "nuages", label: "Nuages", color: "#FF9800" },
+        { key: "humidites", label: "Humidités", color: "#E91E63" },
+      ].map((item) => (
+        <TouchableOpacity
+          key={item.key}
+          style={[
+            styles.dataButton,
+            { backgroundColor: selectedData[item.key] ? item.color : "#ddd" },
+          ]}
+          onPress={() => toggleDataSelection(item.key)}
+        >
+          <Text style={{ color: selectedData[item.key] ? "#fff" : "#000" }}>{item.label}</Text>
+        </TouchableOpacity>
+      ))}
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogoutClick}>
         <Text style={styles.logoutText}>Déconnexion</Text>
@@ -112,6 +139,7 @@ export default function Home() {
                       humidity: data.humidity?.[0] || "N/A",
                       clouds: Array.isArray(data.clouds) && data.clouds.length > 0 ? data.clouds[0] : "N/A",
 
+
                     };
                     
                     setCurrentWeather(currentWeatherData);
@@ -130,7 +158,7 @@ export default function Home() {
                     <Text style={styles.weatherText}>☁️ Nuages: {currentWeather?.clouds}%</Text>
                     <Text style={styles.weatherText}>🌧️ Précipitations: {currentWeather?.precipitation} mm</Text>
                   </View>
-                  <Graph data={weatherData} />
+                  <Graph data={weatherData} selectedData={selectedData} />
                 </>
               )}
               {!loading && !weatherData && (
@@ -140,15 +168,12 @@ export default function Home() {
           ) : (
             <Text style={styles.promptText}>
               Bienvenue sur notre application de météo !{'\n\n'}
-              Vous trouvez ici les données météo pour la semaine. De plus, vous pourrez choisir 
-              quelle données vous souhaitez afficher à votre guise.{'\n\n'}
-              Il y a également un graphe permettant une meilleure visualisation des données.
+              Vous pouvez choisir quelles données afficher en ouvrant le menu et en sélectionnant les types de données.{'\n\n'}
+              Un graphe vous permettra une meilleure visualisation.
             </Text>
           )}
         </View>
       </View>
     </DrawerLayoutAndroid>
   );
-
 }
-
