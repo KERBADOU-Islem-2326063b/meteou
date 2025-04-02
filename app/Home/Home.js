@@ -4,6 +4,7 @@ import Header from "../Header/Header";
 import { useAuth } from "../Contexts/AuthContext";
 import Graph from "../Graph/Graph";
 import Api from "../Api/Api";
+import WeatherDetails from "../WeatherDetails/WeatherDetails";
 import { styles } from "./HomeStyle"; 
 
 
@@ -13,6 +14,7 @@ export default function Home() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const drawerRef = useRef(null);
+  const [currentWeather, setCurrentWeather] = useState(null);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -98,19 +100,43 @@ export default function Home() {
             <>
               <Text style={styles.cityText}>Localisation: {selectedCity}</Text>
               
-              <Api city={selectedCity} onDataReceived={(data) => {
-                setWeatherData(data);
-                setLoading(false);
-              }} />
+              <Api 
+                city={selectedCity} 
+                onDataReceived={(data) => {
+                  
+                  if (data && data.datasets && data.datasets[0] && data.datasets[0].data) {
+                    const temps = data.datasets[0].data;
+                    const currentWeatherData = {
+                      temperature: temps[0]?.toFixed(1) || "N/A",
+                      precipitation: data.precipitation?.[0]?.toFixed(1) || "0",
+                      humidity: data.humidity?.[0] || "N/A",
+                      clouds: Array.isArray(data.clouds) && data.clouds.length > 0 ? data.clouds[0] : "N/A",
 
-              {loading ? (
-                <Text style={styles.loadingText}>Chargement des données météo...</Text>
-              ) : weatherData ? (
-                <Graph data={weatherData} />
-              ) : (
+                    };
+                    
+                    setCurrentWeather(currentWeatherData);
+                    setWeatherData(data);
+                  }
+                  setLoading(false);
+                }}
+              />
+
+              {loading && <Text style={styles.loadingText}>Chargement...</Text>}
+              {!loading && weatherData && (
+                <>
+                  <View style={styles.weatherSummary}>
+                    <Text style={styles.weatherText}>🌡️ Température: {currentWeather?.temperature}°C</Text>
+                    <Text style={styles.weatherText}>💧 Humidité: {currentWeather?.humidity}%</Text>
+                    <Text style={styles.weatherText}>☁️ Nuages: {currentWeather?.clouds}%</Text>
+                    <Text style={styles.weatherText}>🌧️ Précipitations: {currentWeather?.precipitation} mm</Text>
+                  </View>
+                  <Graph data={weatherData} />
+                </>
+              )}
+              {!loading && !weatherData && (
                 <Text style={styles.errorText}>Aucune donnée disponible.</Text>
               )}
-            </>
+              </>
           ) : (
             <Text style={styles.promptText}>
               Bienvenue sur notre application de météo !{'\n\n'}

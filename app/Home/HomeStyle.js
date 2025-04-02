@@ -85,4 +85,20 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  weatherSummary: {
+    marginBottom: 20, 
+    padding: 20,
+    backgroundColor: '#f1f1f1',
+    borderRadius: 8,
+  },
+
+  weatherText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
+  },
+
 });
+
+export default styles;

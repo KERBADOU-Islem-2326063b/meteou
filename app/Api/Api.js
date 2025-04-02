@@ -23,13 +23,16 @@ export default function Api({ city, onDataReceived }) {
 
      
       const weatherRes = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&timezone=Europe/Paris&forecast_days=14`
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,cloud_cover&timezone=Europe/Paris&forecast_days=1`
       );
       const weatherData = await weatherRes.json();
 
       
       const temps = weatherData.hourly.time;
       const temperatures = weatherData.hourly.temperature_2m;
+      const humidites = weatherData.hourly.relative_humidity_2m;
+      const precipitations = weatherData.hourly.precipitation;
+      const nuages = weatherData.hourly.cloud_cover;
       const dates = [...new Set(temps.map((t) => t.split("T")[0]))];
 
       
@@ -37,6 +40,9 @@ export default function Api({ city, onDataReceived }) {
         labels: temps.map((t) => t.split("T")[1]),
         datasets: [{ data: temperatures, strokeWidth: 2 }],
         dates,
+        humidity: humidites, 
+        precipitation: precipitations,  
+        clouds: nuages,  
       });
     } catch (error) {
       console.error("Erreur API météo :", error);
