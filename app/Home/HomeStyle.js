@@ -99,6 +99,38 @@ export const styles = StyleSheet.create({
     color: '#333',
   },
 
+  formContainer: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#FFF",
+    borderRadius: 5,
+  },
+  
+  input: {
+    backgroundColor: "white",
+    color: "black",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 10,
+  },
+  
+  validateButton: {
+    backgroundColor: "#4CAF50",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  
+  validateText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  
+
 });
 
 export default styles;

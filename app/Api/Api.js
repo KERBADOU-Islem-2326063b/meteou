@@ -1,12 +1,6 @@
 import { useEffect } from "react";
 
 export default function Api({ city, onDataReceived }) {
-  useEffect(() => {
-    if (city) {
-      fetchWeather(city);
-    }
-  }, [city]);
-
   const fetchWeather = async (cityName) => {
     try {
       const geoRes = await fetch(
@@ -14,7 +8,7 @@ export default function Api({ city, onDataReceived }) {
       );
       const geoData = await geoRes.json();
 
-      if (!geoData.results) {
+      if (!geoData.results || geoData.results.length === 0) {
         alert("Ville non trouvée !");
         return;
       }
@@ -22,38 +16,48 @@ export default function Api({ city, onDataReceived }) {
       const { latitude, longitude } = geoData.results[0];
 
       const weatherRes = await fetch(
-
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,cloud_cover&timezone=Europe/Paris&forecast_days=1`
-
       );
       const weatherData = await weatherRes.json();
 
-      const temps = weatherData.hourly.time;
-      const temperatures = weatherData.hourly.temperature_2m;
+      if (!weatherData.hourly) {
+        alert("Données météo indisponibles !");
+        return;
+      }
 
-      const humidites = weatherData.hourly.relative_humidity_2m;
-      const precipitations = weatherData.hourly.precipitation;
-      const nuages = weatherData.hourly.cloud_cover;
+      const { time, temperature_2m, relative_humidity_2m, precipitation, cloud_cover } = weatherData.hourly;
 
-      const dates = [...new Set(temps.map((t) => t.split("T")[0]))];
+      if (!time || !temperature_2m || !relative_humidity_2m || !precipitation || !cloud_cover) {
+        alert("Données météo incomplètes !");
+        return;
+      }
+
+      const dates = [...new Set(time.map((t) => t.split("T")[0]))];
 
       onDataReceived({
-        labels: temps.map((t) => t.split("T")[1]), 
+        labels: time.map((t) => t.split("T")[1]),
         datasets: [
-          { data: temperatures, strokeWidth: 2, color: () => `rgba(255, 99, 132, 1)` }, 
-          { data: precipitations, strokeWidth: 2, color: () => `rgba(75, 192, 192, 1)` }, 
-          { data: nuages, strokeWidth: 2, color: () => `rgba(153, 102, 255, 1)` }, 
-          { data: humidites, strokeWidth: 2, color: () => `rgba(255, 159, 64, 1)` }, 
+          { data: temperature_2m, strokeWidth: 2, color: () => `rgba(255, 99, 132, 1)` }, // Température
+          { data: precipitation, strokeWidth: 2, color: () => `rgba(75, 192, 192, 1)` }, // Précipitations
+          { data: cloud_cover, strokeWidth: 2, color: () => `rgba(153, 102, 255, 1)` }, // Nuages
+          { data: relative_humidity_2m, strokeWidth: 2, color: () => `rgba(255, 159, 64, 1)` }, // Humidité
         ],
         dates,
-        humidity: humidites, 
-        precipitation: precipitations,  
-        clouds: nuages,  
+        humidity: relative_humidity_2m,
+        precipitation,
+        clouds: cloud_cover,
       });
     } catch (error) {
       console.error("Erreur API météo :", error);
+      alert("Une erreur est survenue lors de la récupération des données météo.");
     }
   };
+
+  useEffect(() => {
+    if (city) {
+      fetchWeather(city);
+    }
+  }, [city]);
 
   return null;
 }
