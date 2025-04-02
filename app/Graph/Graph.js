@@ -15,9 +15,9 @@ export default function Graph({ data, selectedData }) {
 
   const legend = [
     { key: "temperature", label: "Température", color: "#1E90FF" },
-    { key: "rain", label: "Pluie", color: "#4CAF50" },
-    { key: "cloudCover", label: "Nuages", color: "#FF9800" },
-    { key: "precipitationProbability", label: "Probabilité précip.", color: "#E91E63" },
+    { key: "precipitations", label: "Pluie", color: "#4CAF50" },
+    { key: "nuages", label: "Nuages", color: "#FF9800" },
+    { key: "humidites", label: "Humidités", color: "#E91E63" },
   ];
 
   const getDayData = (dayIndex) => {
@@ -30,13 +30,13 @@ export default function Graph({ data, selectedData }) {
     if (selectedData.temperature) {
       datasets.push({ data: data.datasets[0].data.slice(startIndex, endIndex).filter((_, i) => i % interval === 0), color: () => `#1E90FF` });
     }
-    if (selectedData.rain) {
+    if (selectedData.precipitations) {
       datasets.push({ data: data.datasets[1].data.slice(startIndex, endIndex).filter((_, i) => i % interval === 0), color: () => `#4CAF50` });
     }
-    if (selectedData.cloudCover) {
+    if (selectedData.nuages) {
       datasets.push({ data: data.datasets[2].data.slice(startIndex, endIndex).filter((_, i) => i % interval === 0), color: () => `#FF9800` });
     }
-    if (selectedData.precipitationProbability) {
+    if (selectedData.humidites) {
       datasets.push({ data: data.datasets[3].data.slice(startIndex, endIndex).filter((_, i) => i % interval === 0), color: () => `#E91E63` });
     }
 
@@ -107,7 +107,7 @@ export default function Graph({ data, selectedData }) {
           selectedData[item.key] && (
             <View key={item.key} style={{ flexDirection: "row", alignItems: "center", marginRight: 10, marginBottom: 5 }}>
               <View style={{ width: 10, height: 10, backgroundColor: item.color, marginRight: 5 }} />
-              <Text>{item.label}</Text>            
+              <Text>{item.label}</Text>
             </View>
           )
         ))}
