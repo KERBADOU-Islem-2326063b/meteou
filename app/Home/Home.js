@@ -4,6 +4,7 @@ import Header from "../Header/Header";
 import { useAuth } from "../Contexts/AuthContext";
 import Graph from "../Graph/Graph";
 import Api from "../Api/Api";
+import Slider from '@react-native-community/slider';
 import { styles } from "./HomeStyle"; 
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
     humidites: false,
   });
 
+  const [hourIndex, setHourIndex] = useState(0);
   const drawerRef = useRef(null);
   const [currentWeather, setCurrentWeather] = useState(null);
 
@@ -133,15 +135,17 @@ export default function Home() {
                   
                   if (data && data.datasets && data.datasets[0] && data.datasets[0].data) {
                     const temps = data.datasets[0].data;
+                    const precipitations = data.precipitation || [];
+                    const humidites = data.humidity || [];
+                    const nuages = data.clouds || [];
+
                     const currentWeatherData = {
-                      temperature: temps[0]?.toFixed(1) || "N/A",
-                      precipitation: data.precipitation?.[0]?.toFixed(1) || "0",
-                      humidity: data.humidity?.[0] || "N/A",
-                      clouds: Array.isArray(data.clouds) && data.clouds.length > 0 ? data.clouds[0] : "N/A",
-
-
+                      temperature: temps[hourIndex]?.toFixed(1) || "N/A",
+                      precipitation: precipitations[hourIndex]?.toFixed(1) || "0",
+                      humidity: humidites[hourIndex] || "N/A",
+                      clouds: nuages[hourIndex] || "N/A",
                     };
-                    
+
                     setCurrentWeather(currentWeatherData);
                     setWeatherData(data);
                   }
@@ -153,11 +157,26 @@ export default function Home() {
               {!loading && weatherData && (
                 <>
                   <View style={styles.weatherSummary}>
-                    <Text style={styles.weatherText}>🌡️ Température: {currentWeather?.temperature}°C</Text>
-                    <Text style={styles.weatherText}>💧 Humidité: {currentWeather?.humidity}%</Text>
-                    <Text style={styles.weatherText}>☁️ Nuages: {currentWeather?.clouds}%</Text>
-                    <Text style={styles.weatherText}>🌧️ Précipitations: {currentWeather?.precipitation} mm</Text>
+                    <Text style={styles.weatherText}>🕒 Heure des données: {hourIndex}:00</Text>
+                    {selectedData.temperature && <Text style={styles.weatherText}>🌡️ Température: {currentWeather?.temperature}°C</Text>}
+                    {selectedData.humidites && <Text style={styles.weatherText}>💧 Humidité: {currentWeather?.humidity}%</Text>}
+                    {selectedData.nuages && <Text style={styles.weatherText}>☁️ Nuages: {currentWeather?.clouds}%</Text>}
+                    {selectedData.precipitations && <Text style={styles.weatherText}>🌧️ Précipitations: {currentWeather?.precipitation} mm</Text>}
                   </View>
+
+                  <View style={styles.sliderContainer}>
+                    <Text style={styles.sliderLabel}>Sélectionner l'heure :</Text>
+                    <Slider
+                      style={styles.slider}
+                      minimumValue={0}
+                      maximumValue={24}
+                      step={1}
+                      value={hourIndex}
+                      onValueChange={setHourIndex}
+                    />
+                    <Text style={styles.sliderValue}>Heure: {hourIndex}:00</Text>
+                  </View>
+
                   <Graph data={weatherData} selectedData={selectedData} />
                 </>
               )}

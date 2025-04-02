@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 export default function Api({ city, onDataReceived }) {
+
   useEffect(() => {
     if (city) {
       fetchWeather(city);
@@ -30,7 +31,6 @@ export default function Api({ city, onDataReceived }) {
 
       const temps = weatherData.hourly.time;
       const temperatures = weatherData.hourly.temperature_2m;
-
       const humidites = weatherData.hourly.relative_humidity_2m;
       const precipitations = weatherData.hourly.precipitation;
       const nuages = weatherData.hourly.cloud_cover;
