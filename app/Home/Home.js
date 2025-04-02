@@ -4,7 +4,6 @@ import Header from "../Header/Header";
 import { useAuth } from "../Contexts/AuthContext";
 import Graph from "../Graph/Graph";
 import Api from "../Api/Api";
-import WeatherDetails from "../WeatherDetails/WeatherDetails";
 import { styles } from "./HomeStyle"; 
 
 export default function Home() {
@@ -14,9 +13,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [selectedData, setSelectedData] = useState({
     temperature: true,
-    rain: false,
-    cloudCover: false,
-    precipitationProbability: false,
+    precipitations: false,
+    nuages: false,
+    humidites: false,
   });
 
   const drawerRef = useRef(null);
