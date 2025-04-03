@@ -32,11 +32,10 @@ export default function Api({ city, onDataReceived }) {
         return;
       }
 
-      // Traitement des données temporelles
       const timeData = {
         days: processDays(time),
         hours: Array.from({ length: 24 }, (_, i) => i),
-        allTimes: time // Garder toutes les données temporelles
+        allTimes: time 
       };
 
       const dates = [...new Set(time.map((t) => t.split("T")[0]))];
@@ -44,17 +43,17 @@ export default function Api({ city, onDataReceived }) {
       onDataReceived({
         labels: time.map((t) => t.split("T")[1]),
         datasets: [
-          { data: temperature_2m, strokeWidth: 2, color: () => `rgba(255, 99, 132, 1)` }, // Température
-          { data: precipitation, strokeWidth: 2, color: () => `rgba(75, 192, 192, 1)` }, // Précipitations
-          { data: cloud_cover, strokeWidth: 2, color: () => `rgba(153, 102, 255, 1)` }, // Nuages
-          { data: relative_humidity_2m, strokeWidth: 2, color: () => `rgba(255, 159, 64, 1)` }, // Humidité
+          { data: temperature_2m, strokeWidth: 2, color: () => `rgba(255, 99, 132, 1)` }, 
+          { data: precipitation, strokeWidth: 2, color: () => `rgba(75, 192, 192, 1)` }, 
+          { data: cloud_cover, strokeWidth: 2, color: () => `rgba(153, 102, 255, 1)` }, 
+          { data: relative_humidity_2m, strokeWidth: 2, color: () => `rgba(255, 159, 64, 1)` },
         ],
         dates,
         humidity: relative_humidity_2m,
         precipitation,
         clouds: cloud_cover,
-        timeData, // Ajout des données temporelles
-        temperature: temperature_2m // Ajout des températures pour accès direct
+        timeData, 
+        temperature: temperature_2m 
       });
     } catch (error) {
       console.error("Erreur API météo :", error);
@@ -62,7 +61,6 @@ export default function Api({ city, onDataReceived }) {
     }
   };
 
-  // Fonction pour formater les jours
   const processDays = (timeArray) => {
     const days = new Set();
     const dateFormat = new Intl.DateTimeFormat('fr-FR', {
