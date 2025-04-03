@@ -16,7 +16,7 @@ export default function Api({ city, onDataReceived }) {
       const { latitude, longitude } = geoData.results[0];
 
       const weatherRes = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,cloud_cover&timezone=Europe/Paris&forecast_days=1`
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,cloud_cover&timezone=Europe/Paris&forecast_days=7`
       );
       const weatherData = await weatherRes.json();
 
@@ -32,6 +32,13 @@ export default function Api({ city, onDataReceived }) {
         return;
       }
 
+      // Traitement des données temporelles
+      const timeData = {
+        days: processDays(time),
+        hours: Array.from({length: 24}, (_, i) => i),
+        allTimes: time // Garder toutes les données temporelles
+      };
+
       const dates = [...new Set(time.map((t) => t.split("T")[0]))];
 
       onDataReceived({
@@ -46,11 +53,33 @@ export default function Api({ city, onDataReceived }) {
         humidity: relative_humidity_2m,
         precipitation,
         clouds: cloud_cover,
+        timeData, // Ajout des données temporelles
+        temperature: temperature_2m // Ajout des températures pour accès direct
       });
     } catch (error) {
       console.error("Erreur API météo :", error);
       alert("Une erreur est survenue lors de la récupération des données météo.");
     }
+  };
+
+  // Fonction pour formater les jours
+  const processDays = (timeArray) => {
+    const days = [];
+    const dateFormat = new Intl.DateTimeFormat('fr-FR', { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long' 
+    });
+    
+    timeArray.forEach(timeStr => {
+      const date = new Date(timeStr);
+      const formatted = dateFormat.format(date);
+      if (!days.includes(formatted)) {
+        days.push(formatted);
+      }
+    });
+    
+    return days;
   };
 
   useEffect(() => {

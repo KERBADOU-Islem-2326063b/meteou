@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, DrawerLayoutAndroid, TextInput, Alert } from "react-native";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { View, Text, TouchableOpacity, DrawerLayoutAndroid, TextInput, Alert, ActivityIndicator, StyleSheet } from "react-native";
+import Slider from '@react-native-community/slider';
 import Header from "../Header/Header";
 import { useAuth } from "../Contexts/AuthContext";
 import Graph from "../Graph/Graph";
@@ -9,10 +10,9 @@ import { styles } from "./HomeStyle";
 export default function Home() {
   const { selectedCity, setSelectedCity, handleLogout, cities, setCities } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [newCity, setNewCity] = useState(""); 
+  const [newCity, setNewCity] = useState("");
   const [selectedData, setSelectedData] = useState({
     temperature: true,
     precipitations: false,
@@ -21,7 +21,18 @@ export default function Home() {
   });
 
   const drawerRef = useRef(null);
-  const [currentWeather, setCurrentWeather] = useState(null);
+  const [weatherState, setWeatherState] = useState({
+    currentWeather: null,
+    weatherData: null,
+    timeData: null,
+  });
+  const [timeRange, setTimeRange] = useState({
+    day: 0,
+    hour: new Date().getHours(),
+  });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playbackIntervalRef = useRef(null);
+  const playbackSpeed = 500;
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -30,6 +41,39 @@ export default function Home() {
       drawerRef.current?.closeDrawer();
     }
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (playbackIntervalRef.current) {
+        clearInterval(playbackIntervalRef.current);
+      }
+    };
+  }, []);
+
+  const togglePlayback = () => {
+    if (isPlaying) {
+      clearInterval(playbackIntervalRef.current);
+      playbackIntervalRef.current = null;
+    } else {
+      playbackIntervalRef.current = setInterval(() => {
+        setTimeRange(prev => {
+          const newHour = prev.hour + 1;
+          if (newHour >= 24) {
+            const newDay = prev.day + 1;
+            if (newDay >= weatherState.timeData.days.length) {
+              clearInterval(playbackIntervalRef.current);
+              playbackIntervalRef.current = null;
+              setIsPlaying(false);
+              return { day: 0, hour: 0 };
+            }
+            return { day: newDay, hour: 0 };
+          }
+          return { day: prev.day, hour: newHour };
+        });
+      }, playbackSpeed);
+    }
+    setIsPlaying(!isPlaying);
+  };
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -54,19 +98,25 @@ export default function Home() {
   const handleAddCity = () => {
     if (!newCity.trim()) return;
 
+    setLoading(true);
     fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${newCity}&count=1&language=fr&format=json`)
       .then((res) => res.json())
       .then((data) => {
         if (!data.results || data.results.length === 0) {
           alert("Ville non trouvée !");
+          setLoading(false);
           return;
         }
 
         setCities((prevCities) => [...prevCities, { [newCity]: {} }]);
         setNewCity("");
         setShowForm(false);
+        setLoading(false);
       })
-      .catch((error) => console.error("Erreur lors du géocodage :", error));
+      .catch((error) => {
+        console.error("Erreur lors du géocodage :", error);
+        setLoading(false);
+      });
   };
 
   const navigationView = () => (
@@ -114,8 +164,8 @@ export default function Home() {
         </View>
       )}
 
-      <TouchableOpacity 
-        style={styles.addCityButton} 
+      <TouchableOpacity
+        style={styles.addCityButton}
         onPress={() => setShowForm(!showForm)}
       >
         <Text style={styles.addCityText}>{showForm ? "✕" : "+"}</Text>
@@ -146,6 +196,31 @@ export default function Home() {
     </View>
   );
 
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  };
+
+  const handleSliderChange = useCallback(debounce((value) => {
+    setLoading(true);
+    const day = Math.floor(value / 24);
+    const hour = Math.floor(value % 24);
+    setTimeRange({ day, hour });
+
+    const index = day * 24 + hour;
+    const currentWeatherData = {
+      temperature: weatherState.weatherData.temperature?.[index]?.toFixed(1) || "N/A",
+      precipitation: weatherState.weatherData.precipitation?.[index]?.toFixed(1) || "0",
+      humidity: weatherState.weatherData.humidity?.[index] || "N/A",
+      clouds: weatherState.weatherData.clouds?.[index] || "N/A",
+    };
+    setWeatherState((prev) => ({ ...prev, currentWeather: currentWeatherData }));
+    setLoading(false);
+  }, 200), [weatherState.weatherData]);
+
   return (
     <DrawerLayoutAndroid
       ref={drawerRef}
@@ -165,9 +240,9 @@ export default function Home() {
           {selectedCity ? (
             <>
               <Text style={styles.cityText}>Localisation: {selectedCity}</Text>
-              
-              <Api 
-                city={selectedCity} 
+
+              <Api
+                city={selectedCity}
                 onDataReceived={(data) => {
                   if (data?.datasets?.[0]?.data) {
                     const temps = data.datasets[0].data;
@@ -177,27 +252,65 @@ export default function Home() {
                       humidity: data.humidity?.[0] || "N/A",
                       clouds: data.clouds?.[0] || "N/A",
                     };
-                    
-                    setCurrentWeather(currentWeatherData);
-                    setWeatherData(data);
+
+                    setWeatherState({
+                      currentWeather: currentWeatherData,
+                      weatherData: data,
+                      timeData: data.timeData,
+                    });
                   }
                   setLoading(false);
                 }}
               />
 
-              {loading && <Text style={styles.loadingText}>Chargement...</Text>}
-              {!loading && weatherData && (
+              {loading && (
+                <View style={styles.loadingOverlay}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                  <Text style={styles.loadingText}>Chargement...</Text>
+                </View>
+              )}
+              {!loading && weatherState.weatherData && weatherState.timeData && (
                 <>
                   <View style={styles.weatherSummary}>
-                    <Text style={styles.weatherText}>🌡️ Température: {currentWeather?.temperature}°C</Text>
-                    <Text style={styles.weatherText}>💧 Humidité: {currentWeather?.humidity}%</Text>
-                    <Text style={styles.weatherText}>☁️ Nuages: {currentWeather?.clouds}%</Text>
-                    <Text style={styles.weatherText}>🌧️ Précipitations: {currentWeather?.precipitation} mm</Text>
+                    <Text style={styles.weatherText}>🌡️ Température: {weatherState.currentWeather?.temperature}°C</Text>
+                    <Text style={styles.weatherText}>💧 Humidité: {weatherState.currentWeather?.humidity}%</Text>
+                    <Text style={styles.weatherText}>☁️ Nuages: {weatherState.currentWeather?.clouds}%</Text>
+                    <Text style={styles.weatherText}>🌧️ Précipitations: {weatherState.currentWeather?.precipitation} mm</Text>
                   </View>
-                  <Graph data={weatherData} selectedData={selectedData} />
+
+                  <View style={styles.sliderContainer}>
+                    <Text style={styles.sliderLabel}>
+                      Jour: {weatherState.timeData.days[timeRange.day]} | Heure: {timeRange.hour}:00
+                    </Text>
+                    <Slider
+                      style={styles.slider}
+                      minimumValue={0}
+                      maximumValue={weatherState.timeData.days.length * 24 - 1}
+                      step={1}
+                      value={timeRange.day * 24 + timeRange.hour}
+                      onValueChange={handleSliderChange}
+                      minimumTrackTintColor="#1E90FF"
+                      maximumTrackTintColor="#ddd"
+                      thumbTintColor="#1E90FF"
+                    />
+                    <TouchableOpacity
+                      style={styles.playButton}
+                      onPress={() => {
+                        setLoading(true);
+                        togglePlayback();
+                        setLoading(false);
+                      }}
+                    >
+                      <Text style={styles.playButtonText}>
+                        {isPlaying ? '⏸ Pause' : '▶️ Lecture'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <Graph data={weatherState.weatherData} selectedData={selectedData} />
                 </>
               )}
-              </>
+            </>
           ) : (
             <Text style={styles.promptText}>
               Bienvenue sur notre application de météo !{'\n\n'}
@@ -206,6 +319,7 @@ export default function Home() {
           )}
         </View>
       </View>
+      {loading && <View style={styles.blurOverlay} />}
     </DrawerLayoutAndroid>
   );
 }

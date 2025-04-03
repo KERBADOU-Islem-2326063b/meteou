@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
     backgroundColor: "white",
@@ -129,7 +130,44 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  
+  sliderContainer: {
+    padding: 20,
+    width: '100%',
+  },
+  sliderLabel: {
+    textAlign: 'center',
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    zIndex: 10,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#000',
+  },
+  blurOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    zIndex: 9,
+  },
 
 });
 

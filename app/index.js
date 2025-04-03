@@ -2,7 +2,6 @@ import React from "react";
 import { AuthProvider, useAuth } from "./Contexts/AuthContext";
 import Home from "./Home/Home";
 import Login from "./Login/Login";
-import Graph from "./Graph/Graph";
 
 export default function Index() {
   return (
