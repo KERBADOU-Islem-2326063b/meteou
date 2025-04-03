@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { View, Text, Dimensions, ScrollView } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
@@ -13,17 +13,17 @@ export default function Graph({ data, selectedData }) {
   const hoursPerDay = 24;
   const interval = 2;
 
-  const legend = [
+  const legend = useMemo(() => [
     { key: "temperature", label: "Température", color: "#1E90FF" },
     { key: "precipitations", label: "Pluie", color: "#4CAF50" },
     { key: "nuages", label: "Nuages", color: "#FF9800" },
     { key: "humidites", label: "Humidités", color: "#E91E63" },
-  ];
+  ], []);
 
-  const getDayData = (dayIndex) => {
+  const getDayData = useMemo(() => (dayIndex) => {
     const startIndex = dayIndex * hoursPerDay;
     const endIndex = startIndex + hoursPerDay;
-    
+
     const filteredLabels = data.labels.slice(startIndex, endIndex).filter((_, i) => i % interval === 0);
     let datasets = [];
 
@@ -48,9 +48,9 @@ export default function Graph({ data, selectedData }) {
       labels: filteredLabels.map((label) => `${parseInt(label.split(":")[0], 10)}h`),
       datasets,
     };
-  };
+  }, [data, selectedData]);
 
-  const chartConfig = {
+  const chartConfig = useMemo(() => ({
     backgroundGradientFrom: "#fff",
     backgroundGradientTo: "#fff",
     decimalPlaces: 1,
@@ -68,7 +68,7 @@ export default function Graph({ data, selectedData }) {
     style: {
       borderRadius: 10,
     },
-  };
+  }), []);
 
   return (
     <View style={{ alignItems: "center", marginTop: 20 }}>
@@ -112,7 +112,6 @@ export default function Graph({ data, selectedData }) {
           )
         ))}
       </View>
-
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Api({ city, onDataReceived }) {
   const fetchWeather = async (cityName) => {
@@ -35,7 +35,7 @@ export default function Api({ city, onDataReceived }) {
       // Traitement des données temporelles
       const timeData = {
         days: processDays(time),
-        hours: Array.from({length: 24}, (_, i) => i),
+        hours: Array.from({ length: 24 }, (_, i) => i),
         allTimes: time // Garder toutes les données temporelles
       };
 
@@ -64,27 +64,28 @@ export default function Api({ city, onDataReceived }) {
 
   // Fonction pour formater les jours
   const processDays = (timeArray) => {
-    const days = [];
-    const dateFormat = new Intl.DateTimeFormat('fr-FR', { 
-      weekday: 'long', 
-      day: 'numeric', 
-      month: 'long' 
+    const days = new Set();
+    const dateFormat = new Intl.DateTimeFormat('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
     });
-    
+
     timeArray.forEach(timeStr => {
       const date = new Date(timeStr);
       const formatted = dateFormat.format(date);
-      if (!days.includes(formatted)) {
-        days.push(formatted);
-      }
+      days.add(formatted);
     });
-    
-    return days;
+
+    return Array.from(days);
   };
 
+  const prevCityRef = useRef();
+
   useEffect(() => {
-    if (city) {
+    if (city && city !== prevCityRef.current) {
       fetchWeather(city);
+      prevCityRef.current = city;
     }
   }, [city]);
 

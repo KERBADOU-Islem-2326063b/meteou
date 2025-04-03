@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { View, Text, TouchableOpacity, DrawerLayoutAndroid, TextInput, Alert, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, DrawerLayoutAndroid, TextInput, Alert, ActivityIndicator, StyleSheet, Switch } from "react-native";
 import Slider from '@react-native-community/slider';
 import Header from "../Header/Header";
 import { useAuth } from "../Contexts/AuthContext";
@@ -20,6 +20,8 @@ export default function Home() {
     humidites: false,
   });
 
+  const [showGraph, setShowGraph] = useState(false); 
+
   const drawerRef = useRef(null);
   const [weatherState, setWeatherState] = useState({
     currentWeather: null,
@@ -32,7 +34,7 @@ export default function Home() {
   });
   const [isPlaying, setIsPlaying] = useState(false);
   const playbackIntervalRef = useRef(null);
-  const playbackSpeed = 500;
+  const playbackSpeed = 2500;
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -307,7 +309,17 @@ export default function Home() {
                     </TouchableOpacity>
                   </View>
 
-                  <Graph data={weatherState.weatherData} selectedData={selectedData} />
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+                    <Switch
+                      value={showGraph}
+                      onValueChange={setShowGraph}
+                    />
+                    <Text style={{ marginLeft: 8 }}>Afficher le graphique</Text>
+                  </View>
+
+                  {showGraph && (
+                    <Graph data={weatherState.weatherData} selectedData={selectedData} />
+                  )}
                 </>
               )}
             </>
